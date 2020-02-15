@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".auth.PhoneActivity"></activity>
+        <activity android:name=".ProfileActivity" />
         <activity
             android:name=".onBoard.OnBoardActivity"
             android:theme="@style/AppTheme.NoActionBar" />

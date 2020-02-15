@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import com.geektech.taskapp.auth.PhoneActivity;
 import com.geektech.taskapp.onBoard.OnBoardActivity;
 import com.geektech.taskapp.room.AppDataBase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,6 +26,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -54,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
         boolean isShown = preferences.getBoolean("isShown", false);
         if (!isShown) {
             startActivity(new Intent(this, OnBoardActivity.class));
+            finish();
+            return;
+        }
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null){
+            startActivity(new Intent(this, PhoneActivity.class));
             finish();
             return;
         }
