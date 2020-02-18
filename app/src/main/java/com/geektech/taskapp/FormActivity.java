@@ -1,14 +1,17 @@
 package com.geektech.taskapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class FormActivity extends AppCompatActivity {
     private EditText editText;
@@ -22,14 +25,8 @@ public class FormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_form);
         editText = findViewById(R.id.editText);
         editDesc = findViewById(R.id.edit_desk);
-        ImageView imageView = findViewById(R.id.imageView_phone);
-        imageView.setImageResource(R.drawable.ic_phone_iphone_black_24dp);
-        ImageView imageViewFlag = findViewById(R.id.imageViewFlag);
-        Glide.with(this).load(
-                "https://lh3.googleusercontent.com/proxy/Bf4InAT8L9Kzzbav3ywu7tg-JeCu-J8GHdRWWGkGN7QgbjccxjICAhVI6KxWcN4TQtiR7KS5CaHivHMj6HmZNlJ-1H8j4qXByL0_Ag")
-                .into(imageViewFlag);
-        secondIntent();
-        
+        secondOpen();
+
 
 //        Intent intent = getIntent();
 //        intent.getSerializableExtra("task");
@@ -39,7 +36,7 @@ public class FormActivity extends AppCompatActivity {
 //        editDesc.setText(desc);
     }
 
-    private void secondIntent() {
+    private void secondOpen() {
         task = (Task) getIntent().getSerializableExtra("task");
         if (task != null) {
             editText.setText(task.getTitle());
@@ -63,8 +60,23 @@ public class FormActivity extends AppCompatActivity {
             } else {
                 task = new Task(textTitle, textDesc);
                 App.getDataBase().taskDao().insert(task);
+                addDatabase();
             }
             finish();
         }
+    }
+
+    private void addDatabase() {
+        FirebaseFirestore.getInstance().collection("tasks")
+                .add(task).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentReference> task) {
+                if (task.isSuccessful()) {
+                    Toaster.show("Ваши задачи успешно добавлены в базу данных");
+                } else {
+                    Toaster.show("Ошибка: " + task.getException().getMessage());
+                }
+            }
+        });
     }
 }

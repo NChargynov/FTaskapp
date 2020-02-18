@@ -3,6 +3,7 @@ package com.geektech.taskapp;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.multidex.MultiDex;
 import androidx.room.Room;
 
 import com.geektech.taskapp.room.AppDataBase;
@@ -29,5 +30,11 @@ public class App extends Application {
 
     public static AppDataBase getDataBase() {
         return dataBase;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

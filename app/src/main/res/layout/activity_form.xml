@@ -76,6 +76,7 @@
         android:textColor="@color/colorPrimaryWhite"/>
 
     <ImageView
+        app:srcCompat="@drawable/ic_phone_iphone_black_24dp"
         android:id="@+id/imageView_phone"
         android:layout_width="wrap_content"
         android:layout_marginTop="40dp"
@@ -92,11 +93,12 @@
         android:textColor="@color/colorPrimaryWhite"/>
 
     <ImageView
+        android:src="@drawable/flag_drawable"
         android:id="@+id/imageViewFlag"
         android:layout_width="25dp"
         android:layout_gravity="center"
         android:layout_height="25dp"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="20dp" />
 
 
         <TextView

@@ -23,6 +23,15 @@ import com.geektech.taskapp.FormActivity;
 import com.geektech.taskapp.OnItemClickListener;
 import com.geektech.taskapp.R;
 import com.geektech.taskapp.Task;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,14 +59,15 @@ public class HomeFragment extends Fragment {
                 DividerItemDecoration.VERTICAL));
 
         list = new ArrayList<>();
-        App.getDataBase().taskDao().getAllLive().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
-                list.clear();
-                list.addAll(tasks);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        getDataFromFireStore();
+//        App.getDataBase().taskDao().getAllLive().observe(getViewLifecycleOwner(), new Observer<List<Task>>() {
+//            @Override
+//            public void onChanged(List<Task> tasks) {
+//                list.clear();
+//                list.addAll(tasks);
+//                adapter.notifyDataSetChanged();
+//            }
+//        });
 //        list = App.getDataBase().taskDao().getAll();
         adapter = new TaskAdapter(list);
         recyclerView.setAdapter(adapter);
@@ -88,13 +98,15 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
-//            Task task = (Task) data.getSerializableExtra("task");
-//            list.add(task);
-//            adapter.notifyDataSetChanged();
-//        }
-//    }
+    private void getDataFromFireStore() {
+        FirebaseFirestore.getInstance().collection("tasks").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                list.clear();
+                list.addAll(queryDocumentSnapshots.toObjects(Task.class));
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+    }
 }

@@ -34,6 +34,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
 
@@ -41,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -48,12 +51,17 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private String nameForProfile, emailForProfile;
+    private TextView editNameFromNavH, editEmailFromNavH;
+    private View header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences preferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         boolean isShown = preferences.getBoolean("isShown", false);
+
+
         if (!isShown) {
             startActivity(new Intent(this, OnBoardActivity.class));
             finish();
@@ -78,8 +86,27 @@ public class MainActivity extends AppCompatActivity {
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        header = navigationView.getHeaderView(0);
+        editNameFromNavH = header.findViewById(R.id.editHeaderName);
+        editEmailFromNavH = header.findViewById(R.id.editHeaderEmail);
+
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        nameForProfile = pref.getString("name", null);
+        emailForProfile = pref.getString("email", null);
+
+        editNameFromNavH.setText(nameForProfile);
+        editEmailFromNavH.setText(emailForProfile);
+
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+
+            }
+        });
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
                 R.id.nav_tools, R.id.nav_share, R.id.nav_send)
@@ -90,6 +117,30 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
         initFile();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        nameForProfile = pref.getString("name", null);
+        emailForProfile = pref.getString("email", null);
+
+        editNameFromNavH.setText(nameForProfile);
+        editEmailFromNavH.setText(emailForProfile);
+    }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == 1){
+//            SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+//            nameForProfile = pref.getString("name", null);
+//            emailForProfile = pref.getString("email", null);
+//
+//            editNameFromNavH.setText(nameForProfile);
+//            editEmailFromNavH.setText(emailForProfile);
+//        }
+//    }
 
     @AfterPermissionGranted(200)
     private void initFile() {
@@ -152,9 +203,6 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    public void onClickOpenProfileActivity(View view) {
-        startActivity(new Intent(this, ProfileActivity.class));
-    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
