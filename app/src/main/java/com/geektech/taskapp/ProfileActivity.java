@@ -12,10 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
     private EditText editName;
     private EditText editEmail;
     private ImageView imageView;
-    private boolean justUploaded;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
         imageView = findViewById(R.id.imageViewForAvatar);
+        progressBar = findViewById(R.id.progress_bar);
 //        getData();
         getDataListener();
     }
@@ -59,13 +62,30 @@ public class ProfileActivity extends AppCompatActivity {
                     String email = snapshot.getString("email");
                     editName.setText(name);
                     editEmail.setText(email);
-                    String avatarUrl = snapshot.getString("avatarUrl");
-                    if (avatarUrl != null)
-                        Glide.with(ProfileActivity.this).load(avatarUrl).into(imageView);
                 }
             }
         });
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference.child("images").child(userID + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(ProfileActivity.this).load(uri).circleCrop().into(imageView);
+            }
+        });
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        String userID = FirebaseAuth.getInstance().getUid();
+//        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+//        storageReference.child(userID + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//            @Override
+//            public void onSuccess(Uri uri) {
+//                Glide.with(ProfileActivity.this).load(uri).circleCrop().into(imageView);
+//            }
+//        });
+
 
     private void getData() {
         String userID = FirebaseAuth.getInstance().getUid();
@@ -129,6 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
             Uri uri = data.getData();
             imageView.setImageURI(uri);
             uploadImage(uri);
+            Glide.with(this).load(uri).circleCrop().into(imageView);
         }
     }
 
@@ -137,6 +158,7 @@ public class ProfileActivity extends AppCompatActivity {
         final StorageReference reference = FirebaseStorage.getInstance()
                 .getReference().child("images").child(userIDforAvatar + ".jpg");
         UploadTask uploadTask = reference.putFile(uri);
+        progressBar.setVisibility(View.VISIBLE);
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
@@ -151,10 +173,11 @@ public class ProfileActivity extends AppCompatActivity {
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (task.isSuccessful())
+                if (task.isSuccessful()) {
                     update(task.getResult());
-                else
+                } else {
                     Toaster.show("Ошибка загрузки");
+                }
             }
         });
 
@@ -167,6 +190,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toaster.show("Загрузка выполнена");
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
 

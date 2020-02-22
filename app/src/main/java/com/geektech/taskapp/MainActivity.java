@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
 import com.geektech.taskapp.auth.PhoneActivity;
 import com.geektech.taskapp.onBoard.OnBoardActivity;
 import com.geektech.taskapp.room.AppDataBase;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -27,6 +30,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -35,6 +40,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
@@ -54,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private String nameForProfile, emailForProfile;
     private TextView editNameFromNavH, editEmailFromNavH;
     private View header;
+    private ImageView imageViewAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +96,20 @@ public class MainActivity extends AppCompatActivity {
         header = navigationView.getHeaderView(0);
         editNameFromNavH = header.findViewById(R.id.editHeaderName);
         editEmailFromNavH = header.findViewById(R.id.editHeaderEmail);
+        imageViewAvatar = header.findViewById(R.id.imageViewAvatar);
 
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         nameForProfile = pref.getString("name", null);
         emailForProfile = pref.getString("email", null);
+
+        String userId = FirebaseAuth.getInstance().getUid();
+        StorageReference storage = FirebaseStorage.getInstance().getReference();
+        storage.child("images").child(userId + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(MainActivity.this).load(uri).circleCrop().into(imageViewAvatar);
+            }
+        });
 
         editNameFromNavH.setText(nameForProfile);
         editEmailFromNavH.setText(emailForProfile);
@@ -124,6 +141,15 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         nameForProfile = pref.getString("name", null);
         emailForProfile = pref.getString("email", null);
+
+        String userId = FirebaseAuth.getInstance().getUid();
+        StorageReference storage = FirebaseStorage.getInstance().getReference();
+        storage.child("images").child(userId + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(MainActivity.this).load(uri).circleCrop().into(imageViewAvatar);
+            }
+        });
 
         editNameFromNavH.setText(nameForProfile);
         editEmailFromNavH.setText(emailForProfile);
