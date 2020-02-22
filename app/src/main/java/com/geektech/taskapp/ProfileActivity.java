@@ -157,8 +157,8 @@ public class ProfileActivity extends AppCompatActivity {
         String userIDforAvatar = FirebaseAuth.getInstance().getUid();
         final StorageReference reference = FirebaseStorage.getInstance()
                 .getReference().child("images").child(userIDforAvatar + ".jpg");
-        UploadTask uploadTask = reference.putFile(uri);
         progressBar.setVisibility(View.VISIBLE);
+        UploadTask uploadTask = reference.putFile(uri);
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {

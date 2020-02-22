@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,13 +11,14 @@
 
     <ImageView
         android:id="@+id/imageViewForAvatar"
-        android:layout_gravity="center_horizontal"
-        android:src="@mipmap/ic_launcher"
         android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
         android:onClick="onClickImage"
-        android:layout_height="200dp"/>
+        android:src="@mipmap/ic_launcher" />
 
     <EditText
+        android:layout_below="@+id/imageViewForAvatar"
         android:id="@+id/editName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,23 +26,25 @@
         android:inputType="textCapSentences" />
 
     <EditText
+        android:layout_below="@+id/editName"
         android:id="@+id/editEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Введите e-mail" />
 
     <Button
+        android:layout_below="@+id/editEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onClick"
         android:text="save" />
 
     <ProgressBar
-        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"
         android:id="@+id/progress_bar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:visibility="invisible"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        />
+        android:layout_centerHorizontal="true" />
 
-</LinearLayout>
+</RelativeLayout>
